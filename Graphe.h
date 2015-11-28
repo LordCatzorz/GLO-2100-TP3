@@ -38,7 +38,7 @@ public:
 	};
 	
 	
-	typedef std::vector<std::vector<voisin>> liste_voisins;
+	typedef std::vector< std::vector<voisin> > liste_voisins;
 
 	void DijkstraCalculerChemins(unsigned int p_origine);
 

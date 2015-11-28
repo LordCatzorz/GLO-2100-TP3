@@ -198,7 +198,7 @@ void Graphe<T,N>::DijkstraCalculerChemins(unsigned int p_origine)
 
 	m_predecesseur.clear();
 	m_predecesseur.resize(tailleListeVoisin, -1);
-	std::set<std::pair<N, unsigned int>> fileArcs;
+	std::set< std::pair<N, unsigned int> > fileArcs;
 	fileArcs.insert(std::make_pair(m_distance_minimum[p_origine], p_origine));
 	
 	while (!fileArcs.empty())
@@ -210,7 +210,7 @@ void Graphe<T,N>::DijkstraCalculerChemins(unsigned int p_origine)
 		//Visite chaque arc sortant du sommet;
 		const std::vector<voisin>& vecteurVoisins = m_listeVoisin[sommet];
 
-		for(std::vector<voisin>::const_iterator iter_voisin = vecteurVoisins.begin(); iter_voisin != vecteurVoisins.end(); iter_voisin++)
+		for(typename std::vector<voisin>::const_iterator iter_voisin = vecteurVoisins.begin(); iter_voisin != vecteurVoisins.end(); iter_voisin++)
 		{
 			unsigned int unVoisin = iter_voisin->destination;
 			N poidsVoisin = iter_voisin->poids;
