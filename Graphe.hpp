@@ -25,8 +25,9 @@ Graphe<T,N>::Graphe(size_t n) : m_nbSommets(n)
 {
 	m_nbSommets = n;
 	m_noms.resize(n);
-	m_matrice.resize(n);
-	for (unsigned int i = 0; i < n; ++i)
+	/*m_matrice.resize(n);*/
+	m_listeVoisin.resize(n);
+	/*for (unsigned int i = 0; i < n; ++i)
 	{
 		m_matrice[i].resize(n);
 		for (unsigned int j = 0; j < n; ++j)
@@ -36,7 +37,7 @@ Graphe<T,N>::Graphe(size_t n) : m_nbSommets(n)
 			else
 				m_matrice[i][j] = numeric_limits<N>::max();
 		}
-	}
+	}*/
 
 }
 //! \brief		Destructeur
@@ -62,7 +63,7 @@ template<typename T,typename N>
 const N & Graphe<T,N>::reqPoids(unsigned int i, unsigned int j) const
 {
 	PRECONDITION( i< m_nbSommets && j < m_nbSommets);
-	return m_matrice[i][j];
+	return 0;//m_listeVoisin[i][j].poids;//m_matrice[i][j];
 }
 
 template<typename T,typename N>
@@ -75,8 +76,11 @@ void Graphe<T,N>::nommer(unsigned int i, const T & p_nom)
 template<typename T,typename N>
 void Graphe<T,N>::ajouteArc(unsigned int i, unsigned int j, N poids)
 {
-	PRECONDITION( i< m_nbSommets && j < m_nbSommets);
-	m_matrice[i][j] = poids;
+	/*PRECONDITION( i< m_nbSommets && j < m_nbSommets);
+	m_matrice[i][j] = poids;*/
+	m_listeVoisin[i].push_back(voisin(j, poids));
+
+
 }
 
 //! \brief Algorithme de Dijkstra permettant de trouver le plus court chemin entre p_origine et p_destination
@@ -171,3 +175,56 @@ N Graphe<T,N>::dijkstra(const unsigned int & p_origine, const unsigned int & p_d
 
 	return distance[p_destination];
 }
+
+template<typename T,typename N>
+std::list<unsigned int> Graphe<T,N>::DijkstraObtenirPlusPetitCheminVers(unsigned int p_destionation)
+{
+	std::list<unsigned int> chemin;
+	for(;p_destionation != -1;p_destionation =  m_predecesseur[p_destionation])
+	{
+		chemin.push_front(p_destionation);
+	}
+	return chemin;
+}
+
+template<typename T,typename N>
+void Graphe<T,N>::DijkstraCalculerChemins(unsigned int p_origine)
+{
+	int tailleListeVoisin = m_listeVoisin.size();
+	
+	m_distance_minimum.clear();
+	m_distance_minimum.resize(tailleListeVoisin, std::numeric_limits<N>::infinity());
+	m_distance_minimum[p_origine] = 0;
+
+	m_predecesseur.clear();
+	m_predecesseur.resize(tailleListeVoisin, -1);
+	std::set<std::pair<N, unsigned int>> fileArcs;
+	fileArcs.insert(std::make_pair(m_distance_minimum[p_origine], p_origine));
+	
+	while (!fileArcs.empty())
+	{
+		N distance = fileArcs.begin()->first;
+		unsigned int sommet = fileArcs.begin()->second;
+		fileArcs.erase(fileArcs.begin());
+		
+		//Visite chaque arc sortant du sommet;
+		const std::vector<voisin>& vecteurVoisins = m_listeVoisin[sommet];
+
+		for(std::vector<voisin>::const_iterator iter_voisin = vecteurVoisins.begin(); iter_voisin != vecteurVoisins.end(); iter_voisin++)
+		{
+			unsigned int unVoisin = iter_voisin->destination;
+			N poidsVoisin = iter_voisin->poids;
+			N poidsTotalVoisin = distance+poidsVoisin;
+			if (poidsTotalVoisin > m_distance_minimum[unVoisin])
+			{
+				fileArcs.erase(std::make_pair(m_distance_minimum[unVoisin], unVoisin));
+
+				m_distance_minimum[unVoisin] = poidsTotalVoisin;
+				m_predecesseur[unVoisin] = sommet;
+				fileArcs.insert(std::make_pair(m_distance_minimum[unVoisin], unVoisin));
+			}
+		}
+	}
+
+}
+

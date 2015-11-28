@@ -12,8 +12,14 @@
 #include <list>
 #include <stack>
 #include <limits>
+
+#include <utility>
+#include <set>
+
 #include <iostream>
 #include "ContratException.h"
+
+
 
 //! \brief Patron de classe pour graphes orientés pondérés utilisant une matrice de valuation
 //! \brief les numéros de sommets débutent à 0
@@ -23,7 +29,21 @@ template <typename T,typename N>
 class Graphe
 {
 public:
-    
+	
+    struct voisin
+	{
+		unsigned int destination;
+		N poids;
+		voisin(unsigned int p_destination, N p_poids) : destination(p_destination), poids(p_poids){}
+	};
+	
+	
+	typedef std::vector<std::vector<voisin>> liste_voisins;
+
+	void DijkstraCalculerChemins(unsigned int p_origine);
+
+	std::list<unsigned int> DijkstraObtenirPlusPetitCheminVers(unsigned int p_destionation);
+
 	Graphe();
 	Graphe(size_t p_nombre);
 	~Graphe();
@@ -42,8 +62,11 @@ private:
 	std::vector<T> m_noms;  /*! les noms donnés aux sommets */
     std::vector< std::vector<N> > m_matrice; /*!< la matrice d'adjacence */
     
-    
+    liste_voisins m_listeVoisin;
+	std::vector<N> m_distance_minimum;
+	std::vector<unsigned int> m_predecesseur;
 };
+
 
 #include "Graphe.hpp"
 
