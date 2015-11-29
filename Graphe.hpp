@@ -162,6 +162,11 @@ N Graphe<T,N>::dijkstra(const unsigned int & p_origine, const unsigned int & p_d
 		numero = predecesseur[numero];
 		pileDuChemin.push(numero);
 	}
+	while(!pileDuChemin.empty())
+	{
+		p_chemin.push_back( pair<unsigned int, T>(pileDuChemin.top(), reqNom(pileDuChemin.top())) );
+		pileDuChemin.pop();
+	}
 
     //cas où l'on n'a pas de solution
 	if (predecesseur[p_destination] == numeric_limits<unsigned int>::max()
@@ -182,46 +187,52 @@ N Graphe<T,N>::dijkstraV2(const unsigned int & p_origine, const unsigned int & p
 {
 
 	std::vector<unsigned int> predecesseur;
+	std::vector<N> distance_minimum;
 
-	this->DijkstraCalculerChemins(p_origine, predecesseur);
+	this->DijkstraCalculerChemins(p_origine, distance_minimum, predecesseur);
 
-	p_chemin = this->DijkstraObtenirPlusPetitCheminVers(p_destination, predecesseur);
+	//p_chemin = this->DijkstraObtenirPlusPetitCheminVers(p_destination, predecesseur);
 
-	    //cas où l'on n'a pas de solution
-		if (predecesseur[p_destination] == numeric_limits<unsigned int>::max()
-	            && p_destination != p_origine)
-	        return numeric_limits<N>::max();
+	for (unsigned int sommetPrecedent = p_destination;sommetPrecedent != -1;sommetPrecedent =  predecesseur[sommetPrecedent])
+		{
+			p_chemin.push_back( pair<unsigned int, T>(sommetPrecedent, reqNom(sommetPrecedent)) );
+		}
+	std::reverse(p_chemin.begin(), p_chemin.end());
+	//cas où l'on n'a pas de solution
+	if (predecesseur[p_destination] == numeric_limits<unsigned int>::max()
+	       && p_destination != p_origine)
+		return numeric_limits<N>::max();
 
-	return predecesseur[p_origine];
+	return distance_minimum[p_destination];
 }
 
 template<typename T,typename N>
-std::vector< std::pair<unsigned int, T> >& Graphe<T,N>::DijkstraObtenirPlusPetitCheminVers(unsigned int p_destination,
-		std::vector<unsigned int> p_predecesseur) const
+std::vector< std::pair<unsigned int, T> >& Graphe<T,N>::DijkstraObtenirPlusPetitCheminVers(const unsigned int p_destination,
+		const std::vector<unsigned int> p_predecesseur) const
 {
 	std::vector< std::pair<unsigned int, T> >  chemin;
-	for (;p_destination != -1;p_destination =  p_predecesseur[p_destination])
-			{
-				chemin.push_back( pair<unsigned int, T>(p_destination, reqNom(p_destination)) );
-			}
+	for (unsigned int sommetPrecedent = p_destination;sommetPrecedent != -1;sommetPrecedent =  p_predecesseur[sommetPrecedent])
+		{
+			chemin.push_back( pair<unsigned int, T>(sommetPrecedent, reqNom(sommetPrecedent)) );
+		}
 
 	return chemin;
 }
 
 template<typename T,typename N>
 void Graphe<T,N>::DijkstraCalculerChemins(unsigned int p_origine,
+		std::vector<N>& p_distance_minimum,
 		std::vector<unsigned int>& p_predecesseur) const
 {
 	int tailleListeVoisin = m_listeVoisin.size();
-	std::vector<N> distance_minimum;
-	distance_minimum.clear();
-	distance_minimum.resize(tailleListeVoisin, std::numeric_limits<N>::max());
-	distance_minimum[p_origine] = 0;
+	p_distance_minimum.clear();
+	p_distance_minimum.resize(tailleListeVoisin, std::numeric_limits<N>::max());
+	p_distance_minimum[p_origine] = 0;
 
 	p_predecesseur.clear();
 	p_predecesseur.resize(tailleListeVoisin, -1);
 	std::set< std::pair<N, unsigned int> > fileArcs;
-	fileArcs.insert(std::make_pair(distance_minimum[p_origine], p_origine));
+	fileArcs.insert(std::make_pair(p_distance_minimum[p_origine], p_origine));
 	
 	while (!fileArcs.empty())
 	{
@@ -237,13 +248,13 @@ void Graphe<T,N>::DijkstraCalculerChemins(unsigned int p_origine,
 			unsigned int unVoisin = iter_voisin->destination;
 			N poidsVoisin = iter_voisin->poids;
 			N poidsTotalVoisin = distance+poidsVoisin;
-			if (poidsTotalVoisin < distance_minimum[unVoisin])
+			if (poidsTotalVoisin < p_distance_minimum[unVoisin])
 			{
-				fileArcs.erase(std::make_pair(distance_minimum[unVoisin], unVoisin));
+				fileArcs.erase(std::make_pair(p_distance_minimum[unVoisin], unVoisin));
 
-				distance_minimum[unVoisin] = poidsTotalVoisin;
+				p_distance_minimum[unVoisin] = poidsTotalVoisin;
 				p_predecesseur[unVoisin] = sommet;
-				fileArcs.insert(std::make_pair(distance_minimum[unVoisin], unVoisin));
+				fileArcs.insert(std::make_pair(p_distance_minimum[unVoisin], unVoisin));
 			}
 		}
 	}

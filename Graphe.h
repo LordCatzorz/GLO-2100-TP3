@@ -15,6 +15,7 @@
 
 #include <utility>
 #include <set>
+#include <algorithm>
 
 #include <iostream>
 #include "ContratException.h"
@@ -40,11 +41,12 @@ public:
 	
 	typedef std::vector< std::vector<voisin> > liste_voisins;
 
-	void DijkstraCalculerChemins(unsigned int p_origine,
+	void DijkstraCalculerChemins(const unsigned int p_origine,
+					std::vector<N>& p_distance_minimum,
 					std::vector<unsigned int>& p_predecesseur) const;
 
-	std::vector< std::pair<unsigned int, T> >& DijkstraObtenirPlusPetitCheminVers(unsigned int p_destination,
-			std::vector<unsigned int> p_predecesseur) const;
+	std::vector< std::pair<unsigned int, T> >& DijkstraObtenirPlusPetitCheminVers(const unsigned int p_destination,
+			const std::vector<unsigned int> p_predecesseur) const;
 
 	Graphe();
 	Graphe(size_t p_nombre);

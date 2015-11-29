@@ -262,7 +262,7 @@ void comparerAlgo()
 	vector< pair<unsigned int, string> > chemin2;
 
 	const unsigned int nbSt = 376;
-	long double sum_avg = 0;
+
 	for (unsigned int i = 0; i < nbSt; ++i) {
 		cout << "For" << i << "\n";
 		for (unsigned int j = 0; j < nbSt; ++j)
@@ -272,33 +272,33 @@ void comparerAlgo()
 				int duree = metro.dijkstra(i, j, chemin);
 				int duree2 = metro.dijkstraV2(i, j, chemin2);
 
-				if (chemin.size() != chemin2.size())
+				if (duree != duree2)
 				{
 					cout << "Erreur taille des chemins\nOrigine:" << i << "\nDestination:"<<j<<"\nDurée algo fourni:"<<duree<<"\nDurée nouvel algo:" << duree2 <<"\n**************\n" ;
 				}
 				else
 				{
 					bool erreurChemin = false;
-					for (int i = 0; !erreurChemin && i < chemin.size(); i++)
+					for (unsigned int k = 0; erreurChemin == false && k < chemin.size(); k++)
 					{
-						if (chemin[i] != chemin[j])
+						if (chemin[k].first != chemin[k].first)
 						{
 							erreurChemin = true;
 						}
 					}
 
-					if (erreurChemin)
+					if (erreurChemin == true)
 					{
 						cout << "Erreur chemin different\n Origine:" << i << "\nDestination:"<<j<<"\n";
 						cout << "Le plus court chemin trouvé par L'algo fourni est: " << endl;
-						for (unsigned int i = 0; i < chemin.size(); ++i)
+						for (unsigned int k = 0; k < chemin.size(); ++k)
 						{
-							cout << chemin[i].first << " " << chemin[i].second << endl;
+							cout << chemin[k].first << " " << chemin[k].second << endl;
 						}
 						cout << "Le plus court chemin trouvé par le nouvel algo est: " << endl;
-						for (unsigned int i = 0; i < chemin2.size(); ++i)
+						for (unsigned int k = 0; i < chemin2.size(); ++k)
 						{
-							cout << chemin2[i].first << " " << chemin2[i].second << endl;
+							cout << chemin2[k].first << " " << chemin2[k].second << endl;
 						}
 					}
 				}
