@@ -62,7 +62,7 @@ Graphe<string,unsigned int> chargerGraphe(ifstream & p_fichierEntree)
 	return metro;
 }
 
-int executionUnePaire()
+int executionUnePaireAncienAlgo()
 {
 	timeval tv1;
 	timeval tv2;
@@ -105,8 +105,52 @@ int executionUnePaire()
 	return 0;
 }
 
+int executionUnePaireNouvelAlgo()
+{
+	timeval tv1;
+	timeval tv2;
+
+	ifstream fichier("Metro.txt");
+	Graphe<string,unsigned int> metro = chargerGraphe(fichier);
+
+	unsigned int numOrigine;
+	unsigned int numDestination;
+	unsigned int duree;
+
+	cout << "Entrez le numéro de la station de départ" << endl;
+	cin >> numOrigine;
+
+	cout << "Entrez le numéro de la station d'arrivée" << endl;
+	cin >> numDestination;
+
+	if (gettimeofday(&tv1, 0) != 0)
+			throw logic_error("gettimeofday() a échoué");
+
+	vector< pair<unsigned int, string> > chemin;
+	duree = metro.dijkstraV2(numOrigine,numDestination,chemin);
+	if (duree == numeric_limits<unsigned int>::max())
+		throw logic_error("Graphe<T,N>::DijkstraCalculerChemins: pas de solution pour cette paire origine/destination");
+
+	if (gettimeofday(&tv2, 0) != 0)
+			throw logic_error("gettimeofday() a échoué");
+
+	POSTCONDITION(duree >= 0);
+	cout << "Le plus court chemin trouvé par Dijkstra est: " << endl;
+	for (unsigned int i = 0; i < chemin.size(); ++i)
+	{
+		cout << chemin[i].first << " " << chemin[i].second << endl;
+	}
+	cout << "avec un temps estimé de " << duree << " secondes" << endl << endl;
+
+	cout << "Temps d'exécution = " << tempsExecution(tv1, tv2)
+				<< " microsecondes" << endl << endl;
+
+	return 0;
+}
+
+
 //exécute un algorithme de plus court chemin sur toutes les paires possibles
-int moyenneToutesLesPaires()
+int moyenneToutesLesPairesAncienAlgo()
 {
 	timeval tv1;
 	timeval tv2;
@@ -127,15 +171,61 @@ int moyenneToutesLesPaires()
 		unsigned long total_ms = 0;
 		std::vector<unsigned int> distance_minimum;
 		std::vector<unsigned int> predecesseurs;
-		metro.DijkstraCalculerChemins(i);
+		//metro.DijkstraCalculerChemins(i);
 		for (unsigned int j = 0; j < nbSt; ++j) 
 		{
 			if (j != i) 
 			{
 				if (gettimeofday(&tv1, 0) != 0)
 					throw logic_error("gettimeofday() a échoué");
-				//duree = metro.dijkstra(i, j, chemin);
-				duree = metro.DijkstraObtenirPlusPetitCheminVers(j).size();
+				duree = metro.dijkstra(i, j, chemin);
+				//duree = metro.DijkstraObtenirPlusPetitCheminVers(j).size();
+				if (gettimeofday(&tv2, 0) != 0)
+					throw logic_error("gettimeofday() a échoué");
+				POSTCONDITION(duree >= 0);
+				long tExec = tempsExecution(tv1, tv2);
+				total_ms += tExec;
+			}
+		}
+		sum_avg += (long double) total_ms / (long double) (nbSt - 1);
+	}
+
+	cout << "Temps d'exécution moyen de l'algorithme de plus court chemin = "
+			<< sum_avg / (long double) nbSt << " microsecondes" << endl << endl;
+
+	return 0;
+}
+
+//exécute un algorithme de plus court chemin sur toutes les paires possibles
+int moyenneToutesLesPairesNouvelAlgo()
+{
+	timeval tv1;
+	timeval tv2;
+
+	ifstream fichier("Metro.txt");
+	Graphe<string,unsigned int> metro = chargerGraphe(fichier);
+
+	unsigned int duree;
+	vector< pair<unsigned int, string> > chemin;
+
+	const unsigned int nbSt = 376;
+	cout
+			<< "Détermination du temps moyen d'exécution de l'algorithme de plus court chemin, moyenné sur toutes les paires origne/destination..."
+			<< endl;
+
+	long double sum_avg = 0;
+	for (unsigned int i = 0; i < nbSt; ++i) {
+		unsigned long total_ms = 0;
+		std::vector<unsigned int> distance_minimum;
+		std::vector<unsigned int> predecesseurs;
+		for (unsigned int j = 0; j < nbSt; ++j)
+		{
+			if (j != i)
+			{
+				if (gettimeofday(&tv1, 0) != 0)
+					throw logic_error("gettimeofday() a échoué");
+				duree = metro.dijkstraV2(i, j, chemin);
+
 				if (gettimeofday(&tv2, 0) != 0)
 					throw logic_error("gettimeofday() a échoué");
 				POSTCONDITION(duree >= 0);
@@ -156,13 +246,70 @@ int moyenneToutesLesPaires20fois()
 {
 	for (int i = 0; i < 20; i++)
 	{
-		moyenneToutesLesPaires();
+		moyenneToutesLesPairesNouvelAlgo();
 	}
 	return 0;
 }
 
+void comparerAlgo()
+{
+	ifstream fichier1("Metro.txt");
+	Graphe<string,unsigned int> metro = chargerGraphe(fichier1);
+	ifstream fichier2("Metro.txt");
+	Graphe<string,unsigned int> metro2 = chargerGraphe(fichier2);
+
+	vector< pair<unsigned int, string> > chemin;
+	vector< pair<unsigned int, string> > chemin2;
+
+	const unsigned int nbSt = 376;
+	long double sum_avg = 0;
+	for (unsigned int i = 0; i < nbSt; ++i) {
+		cout << "For" << i << "\n";
+		for (unsigned int j = 0; j < nbSt; ++j)
+		{
+			if (j != i)
+			{
+				int duree = metro.dijkstra(i, j, chemin);
+				int duree2 = metro.dijkstraV2(i, j, chemin2);
+
+				if (chemin.size() != chemin2.size())
+				{
+					cout << "Erreur taille des chemins\nOrigine:" << i << "\nDestination:"<<j<<"\nDurée algo fourni:"<<duree<<"\nDurée nouvel algo:" << duree2 <<"\n**************\n" ;
+				}
+				else
+				{
+					bool erreurChemin = false;
+					for (int i = 0; !erreurChemin && i < chemin.size(); i++)
+					{
+						if (chemin[i] != chemin[j])
+						{
+							erreurChemin = true;
+						}
+					}
+
+					if (erreurChemin)
+					{
+						cout << "Erreur chemin different\n Origine:" << i << "\nDestination:"<<j<<"\n";
+						cout << "Le plus court chemin trouvé par L'algo fourni est: " << endl;
+						for (unsigned int i = 0; i < chemin.size(); ++i)
+						{
+							cout << chemin[i].first << " " << chemin[i].second << endl;
+						}
+						cout << "Le plus court chemin trouvé par le nouvel algo est: " << endl;
+						for (unsigned int i = 0; i < chemin2.size(); ++i)
+						{
+							cout << chemin2[i].first << " " << chemin2[i].second << endl;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
 int main()
 {
+	comparerAlgo();
 //	return executionUnePaire();
 //	return moyenneToutesLesPaires();
 	return moyenneToutesLesPaires20fois();

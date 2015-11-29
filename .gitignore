@@ -29,3 +29,6 @@
 *.sdf
 *.opensdf
 /Default/
+/.cproject
+/.project
+/.settings/

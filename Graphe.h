@@ -40,9 +40,11 @@ public:
 	
 	typedef std::vector< std::vector<voisin> > liste_voisins;
 
-	void DijkstraCalculerChemins(unsigned int p_origine);
+	void DijkstraCalculerChemins(unsigned int p_origine,
+					std::vector<unsigned int>& p_predecesseur) const;
 
-	std::list<unsigned int> DijkstraObtenirPlusPetitCheminVers(unsigned int p_destionation);
+	std::vector< std::pair<unsigned int, T> >& DijkstraObtenirPlusPetitCheminVers(unsigned int p_destination,
+			std::vector<unsigned int> p_predecesseur) const;
 
 	Graphe();
 	Graphe(size_t p_nombre);
@@ -56,6 +58,9 @@ public:
 
 	N dijkstra(const unsigned int & p_origine, const unsigned int & p_destination,
 			std::vector< std::pair<unsigned int, T> > & p_chemin) const;
+
+	N dijkstraV2(const unsigned int & p_origine, const unsigned int & p_destination,
+				std::vector< std::pair<unsigned int, T> > & p_chemin) const;
     
 private:
 	size_t m_nbSommets;
@@ -63,8 +68,8 @@ private:
     std::vector< std::vector<N> > m_matrice; /*!< la matrice d'adjacence */
     
     liste_voisins m_listeVoisin;
-	std::vector<N> m_distance_minimum;
-	std::vector<unsigned int> m_predecesseur;
+	//std::vector<N> m_distance_minimum;
+	//std::vector<unsigned int> m_predecesseur;
 };
 
 

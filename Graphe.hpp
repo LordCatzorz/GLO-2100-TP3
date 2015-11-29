@@ -25,9 +25,9 @@ Graphe<T,N>::Graphe(size_t n) : m_nbSommets(n)
 {
 	m_nbSommets = n;
 	m_noms.resize(n);
-	/*m_matrice.resize(n);*/
+	m_matrice.resize(n);
 	m_listeVoisin.resize(n);
-	/*for (unsigned int i = 0; i < n; ++i)
+	for (unsigned int i = 0; i < n; ++i)
 	{
 		m_matrice[i].resize(n);
 		for (unsigned int j = 0; j < n; ++j)
@@ -37,7 +37,7 @@ Graphe<T,N>::Graphe(size_t n) : m_nbSommets(n)
 			else
 				m_matrice[i][j] = numeric_limits<N>::max();
 		}
-	}*/
+	}
 
 }
 //! \brief		Destructeur
@@ -63,7 +63,7 @@ template<typename T,typename N>
 const N & Graphe<T,N>::reqPoids(unsigned int i, unsigned int j) const
 {
 	PRECONDITION( i< m_nbSommets && j < m_nbSommets);
-	return 0;//m_listeVoisin[i][j].poids;//m_matrice[i][j];
+	return m_matrice[i][j];
 }
 
 template<typename T,typename N>
@@ -76,8 +76,8 @@ void Graphe<T,N>::nommer(unsigned int i, const T & p_nom)
 template<typename T,typename N>
 void Graphe<T,N>::ajouteArc(unsigned int i, unsigned int j, N poids)
 {
-	/*PRECONDITION( i< m_nbSommets && j < m_nbSommets);
-	m_matrice[i][j] = poids;*/
+	PRECONDITION( i< m_nbSommets && j < m_nbSommets);
+	m_matrice[i][j] = poids;
 	m_listeVoisin[i].push_back(voisin(j, poids));
 
 
@@ -162,11 +162,6 @@ N Graphe<T,N>::dijkstra(const unsigned int & p_origine, const unsigned int & p_d
 		numero = predecesseur[numero];
 		pileDuChemin.push(numero);
 	}
-	while(!pileDuChemin.empty())
-	{
-		p_chemin.push_back( pair<unsigned int, T>(pileDuChemin.top(), reqNom(pileDuChemin.top())) );
-		pileDuChemin.pop();
-	}
 
     //cas où l'on n'a pas de solution
 	if (predecesseur[p_destination] == numeric_limits<unsigned int>::max()
@@ -176,30 +171,57 @@ N Graphe<T,N>::dijkstra(const unsigned int & p_origine, const unsigned int & p_d
 	return distance[p_destination];
 }
 
+//! \brief Algorithme de Dijkstra permettant de trouver le plus court chemin entre p_origine et p_destination
+//! \pre p_origine et p_destination doivent être des sommets du graphe
+//! \param[out] la longueur du plus court chemin est retournée
+//! \param[out] le chemin est retourné
+//! \return la longueur du chemin (= numeric_limits<N>::max() si p_destination n'est pas atteignable)
 template<typename T,typename N>
-std::list<unsigned int> Graphe<T,N>::DijkstraObtenirPlusPetitCheminVers(unsigned int p_destionation)
+N Graphe<T,N>::dijkstraV2(const unsigned int & p_origine, const unsigned int & p_destination,
+		std::vector< std::pair<unsigned int, T> > & p_chemin) const
 {
-	std::list<unsigned int> chemin;
-	for(;p_destionation != -1;p_destionation =  m_predecesseur[p_destionation])
-	{
-		chemin.push_front(p_destionation);
-	}
+
+	std::vector<unsigned int> predecesseur;
+
+	this->DijkstraCalculerChemins(p_origine, predecesseur);
+
+	p_chemin = this->DijkstraObtenirPlusPetitCheminVers(p_destination, predecesseur);
+
+	    //cas où l'on n'a pas de solution
+		if (predecesseur[p_destination] == numeric_limits<unsigned int>::max()
+	            && p_destination != p_origine)
+	        return numeric_limits<N>::max();
+
+	return predecesseur[p_origine];
+}
+
+template<typename T,typename N>
+std::vector< std::pair<unsigned int, T> >& Graphe<T,N>::DijkstraObtenirPlusPetitCheminVers(unsigned int p_destination,
+		std::vector<unsigned int> p_predecesseur) const
+{
+	std::vector< std::pair<unsigned int, T> >  chemin;
+	for (;p_destination != -1;p_destination =  p_predecesseur[p_destination])
+			{
+				chemin.push_back( pair<unsigned int, T>(p_destination, reqNom(p_destination)) );
+			}
+
 	return chemin;
 }
 
 template<typename T,typename N>
-void Graphe<T,N>::DijkstraCalculerChemins(unsigned int p_origine)
+void Graphe<T,N>::DijkstraCalculerChemins(unsigned int p_origine,
+		std::vector<unsigned int>& p_predecesseur) const
 {
 	int tailleListeVoisin = m_listeVoisin.size();
-	
-	m_distance_minimum.clear();
-	m_distance_minimum.resize(tailleListeVoisin, std::numeric_limits<N>::infinity());
-	m_distance_minimum[p_origine] = 0;
+	std::vector<N> distance_minimum;
+	distance_minimum.clear();
+	distance_minimum.resize(tailleListeVoisin, std::numeric_limits<N>::max());
+	distance_minimum[p_origine] = 0;
 
-	m_predecesseur.clear();
-	m_predecesseur.resize(tailleListeVoisin, -1);
+	p_predecesseur.clear();
+	p_predecesseur.resize(tailleListeVoisin, -1);
 	std::set< std::pair<N, unsigned int> > fileArcs;
-	fileArcs.insert(std::make_pair(m_distance_minimum[p_origine], p_origine));
+	fileArcs.insert(std::make_pair(distance_minimum[p_origine], p_origine));
 	
 	while (!fileArcs.empty())
 	{
@@ -215,13 +237,13 @@ void Graphe<T,N>::DijkstraCalculerChemins(unsigned int p_origine)
 			unsigned int unVoisin = iter_voisin->destination;
 			N poidsVoisin = iter_voisin->poids;
 			N poidsTotalVoisin = distance+poidsVoisin;
-			if (poidsTotalVoisin > m_distance_minimum[unVoisin])
+			if (poidsTotalVoisin < distance_minimum[unVoisin])
 			{
-				fileArcs.erase(std::make_pair(m_distance_minimum[unVoisin], unVoisin));
+				fileArcs.erase(std::make_pair(distance_minimum[unVoisin], unVoisin));
 
-				m_distance_minimum[unVoisin] = poidsTotalVoisin;
-				m_predecesseur[unVoisin] = sommet;
-				fileArcs.insert(std::make_pair(m_distance_minimum[unVoisin], unVoisin));
+				distance_minimum[unVoisin] = poidsTotalVoisin;
+				p_predecesseur[unVoisin] = sommet;
+				fileArcs.insert(std::make_pair(distance_minimum[unVoisin], unVoisin));
 			}
 		}
 	}
