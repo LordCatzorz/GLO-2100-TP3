@@ -45,9 +45,6 @@ public:
 					std::vector<N>& p_distance_minimum,
 					std::vector<unsigned int>& p_predecesseur) const;
 
-	std::vector< std::pair<unsigned int, T> >& DijkstraObtenirPlusPetitCheminVers(const unsigned int p_destination,
-			const std::vector<unsigned int> p_predecesseur) const;
-
 	Graphe();
 	Graphe(size_t p_nombre);
 	~Graphe();

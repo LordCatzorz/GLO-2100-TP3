@@ -169,8 +169,8 @@ int moyenneToutesLesPairesAncienAlgo()
 	long double sum_avg = 0;
 	for (unsigned int i = 0; i < nbSt; ++i) {
 		unsigned long total_ms = 0;
-		std::vector<unsigned int> distance_minimum;
-		std::vector<unsigned int> predecesseurs;
+		//std::vector<unsigned int> distance_minimum;
+		//std::vector<unsigned int> predecesseurs;
 		//metro.DijkstraCalculerChemins(i);
 		for (unsigned int j = 0; j < nbSt; ++j) 
 		{
@@ -216,8 +216,8 @@ int moyenneToutesLesPairesNouvelAlgo()
 	long double sum_avg = 0;
 	for (unsigned int i = 0; i < nbSt; ++i) {
 		unsigned long total_ms = 0;
-		std::vector<unsigned int> distance_minimum;
-		std::vector<unsigned int> predecesseurs;
+		//std::vector<unsigned int> distance_minimum;
+		//std::vector<unsigned int> predecesseurs;
 		for (unsigned int j = 0; j < nbSt; ++j)
 		{
 			if (j != i)
@@ -309,8 +309,8 @@ void comparerAlgo()
 
 int main()
 {
-	comparerAlgo();
-//	return executionUnePaire();
+//	comparerAlgo();
+//	return executionUnePaireNouvelAlgo();
 //	return moyenneToutesLesPaires();
 	return moyenneToutesLesPaires20fois();
 }

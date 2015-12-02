@@ -193,11 +193,21 @@ N Graphe<T,N>::dijkstraV2(const unsigned int & p_origine, const unsigned int & p
 
 	//p_chemin = this->DijkstraObtenirPlusPetitCheminVers(p_destination, predecesseur);
 
-	for (unsigned int sommetPrecedent = p_destination;sommetPrecedent != -1;sommetPrecedent =  predecesseur[sommetPrecedent])
-		{
-			p_chemin.push_back( pair<unsigned int, T>(sommetPrecedent, reqNom(sommetPrecedent)) );
-		}
-	std::reverse(p_chemin.begin(), p_chemin.end());
+	//std::stack<unsigned int> pileDuChemin;
+	std::deque<unsigned int> dequeDuChemin;
+	for (unsigned int sommetPrecedent = p_destination;sommetPrecedent != std::numeric_limits<unsigned int>::max(); sommetPrecedent =  predecesseur[sommetPrecedent])
+	{
+		dequeDuChemin.push_front(sommetPrecedent);
+		//pileDuChemin.push(sommetPrecedent);
+
+	}
+
+	//	while(!pileDuChemin.empty())
+	//	{
+	//		p_chemin.push_back( pair<unsigned int, T>(pileDuChemin.top(), reqNom(pileDuChemin.top())) );
+	//		pileDuChemin.pop();
+	//	}
+	//std::reverse(p_chemin.begin(), p_chemin.end());
 	//cas où l'on n'a pas de solution
 	if (predecesseur[p_destination] == numeric_limits<unsigned int>::max()
 	       && p_destination != p_origine)
@@ -206,19 +216,12 @@ N Graphe<T,N>::dijkstraV2(const unsigned int & p_origine, const unsigned int & p
 	return distance_minimum[p_destination];
 }
 
-template<typename T,typename N>
-std::vector< std::pair<unsigned int, T> >& Graphe<T,N>::DijkstraObtenirPlusPetitCheminVers(const unsigned int p_destination,
-		const std::vector<unsigned int> p_predecesseur) const
-{
-	std::vector< std::pair<unsigned int, T> >  chemin;
-	for (unsigned int sommetPrecedent = p_destination;sommetPrecedent != -1;sommetPrecedent =  p_predecesseur[sommetPrecedent])
-		{
-			chemin.push_back( pair<unsigned int, T>(sommetPrecedent, reqNom(sommetPrecedent)) );
-		}
 
-	return chemin;
-}
-
+//! \brief Algorithme de Dijkstra permettant de trouver tous les plus petits chemins d'un point d'origine p_origine.
+//! \param[in] p_origine l'index d'un sommet du graphe.
+//! \param[out] p_distance_minimum Un vecteur de taille qui représente la longueur du plus petit chemin du sommet d'origine au sommet à l'index.
+//! \param[out] p_predecesseur Un vecteur d'index qui représente l'index du sommet précédent l'index dans son chemin le plus court du point d'origine
+//! \note C'est algorithme est une version franciser de celui disponible au http://rosettacode.org/wiki/Dijkstra's_algorithm#C.2B.2B
 template<typename T,typename N>
 void Graphe<T,N>::DijkstraCalculerChemins(unsigned int p_origine,
 		std::vector<N>& p_distance_minimum,
@@ -230,15 +233,16 @@ void Graphe<T,N>::DijkstraCalculerChemins(unsigned int p_origine,
 	p_distance_minimum[p_origine] = 0;
 
 	p_predecesseur.clear();
-	p_predecesseur.resize(tailleListeVoisin, -1);
-	std::set< std::pair<N, unsigned int> > fileArcs;
-	fileArcs.insert(std::make_pair(p_distance_minimum[p_origine], p_origine));
+	p_predecesseur.resize(tailleListeVoisin, std::numeric_limits<unsigned int>::max());
+	std::set< std::pair<N, unsigned int> > lesArcsARegarder;
+	lesArcsARegarder.insert(std::make_pair(p_distance_minimum[p_origine], p_origine));
 	
-	while (!fileArcs.empty())
+	while (!lesArcsARegarder.empty())
 	{
-		N distance = fileArcs.begin()->first;
-		unsigned int sommet = fileArcs.begin()->second;
-		fileArcs.erase(fileArcs.begin());
+		//Obtenir le sommet du première arcs.
+		N distance = lesArcsARegarder.begin()->first;
+		unsigned int sommet = lesArcsARegarder.begin()->second;
+		lesArcsARegarder.erase(lesArcsARegarder.begin());
 		
 		//Visite chaque arc sortant du sommet;
 		const std::vector<voisin>& vecteurVoisins = m_listeVoisin[sommet];
@@ -250,11 +254,11 @@ void Graphe<T,N>::DijkstraCalculerChemins(unsigned int p_origine,
 			N poidsTotalVoisin = distance+poidsVoisin;
 			if (poidsTotalVoisin < p_distance_minimum[unVoisin])
 			{
-				fileArcs.erase(std::make_pair(p_distance_minimum[unVoisin], unVoisin));
+				lesArcsARegarder.erase(std::make_pair(p_distance_minimum[unVoisin], unVoisin));
 
 				p_distance_minimum[unVoisin] = poidsTotalVoisin;
 				p_predecesseur[unVoisin] = sommet;
-				fileArcs.insert(std::make_pair(p_distance_minimum[unVoisin], unVoisin));
+				lesArcsARegarder.insert(std::make_pair(p_distance_minimum[unVoisin], unVoisin));
 			}
 		}
 	}
