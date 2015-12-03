@@ -15,6 +15,7 @@
 
 #include <utility>
 #include <set>
+#include <map>
 #include <algorithm>
 
 #include <iostream>
@@ -37,13 +38,22 @@ public:
 		N poids;
 		voisin(unsigned int p_destination, N p_poids) : destination(p_destination), poids(p_poids){}
 	};
+
+    struct solution
+    {
+    	std::vector<N> distance_minimum;
+    	std::vector<unsigned int> predecesseurs;
+    	solution()
+    	{
+    		distance_minimum = std::vector<N>();
+    		predecesseurs = std::vector<unsigned int>();
+    	}
+    };
 	
 	
 	typedef std::vector< std::vector<voisin> > liste_voisins;
 
-	void DijkstraCalculerChemins(const unsigned int p_origine,
-					std::vector<N>& p_distance_minimum,
-					std::vector<unsigned int>& p_predecesseur) const;
+	solution DijkstraCalculerChemins(const unsigned int p_origine) const;
 
 	Graphe();
 	Graphe(size_t p_nombre);
@@ -59,7 +69,7 @@ public:
 			std::vector< std::pair<unsigned int, T> > & p_chemin) const;
 
 	N dijkstraV2(const unsigned int & p_origine, const unsigned int & p_destination,
-				std::vector< std::pair<unsigned int, T> > & p_chemin) const;
+				std::vector< std::pair<unsigned int, T> > & p_chemin);
     
 private:
 	size_t m_nbSommets;
@@ -67,6 +77,7 @@ private:
     std::vector< std::vector<N> > m_matrice; /*!< la matrice d'adjacence */
     
     liste_voisins m_listeVoisin;
+    std::map<unsigned int, solution> m_solutions;
 	//std::vector<N> m_distance_minimum;
 	//std::vector<unsigned int> m_predecesseur;
 };
