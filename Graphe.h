@@ -53,7 +53,6 @@ public:
 	
 	typedef std::vector< std::vector<voisin> > liste_voisins;
 
-	solution DijkstraCalculerChemins(const unsigned int p_origine) const;
 
 	Graphe();
 	Graphe(size_t p_nombre);
@@ -69,17 +68,17 @@ public:
 			std::vector< std::pair<unsigned int, T> > & p_chemin) const;
 
 	N dijkstraV2(const unsigned int & p_origine, const unsigned int & p_destination,
-				std::vector< std::pair<unsigned int, T> > & p_chemin);
+				std::deque< std::pair<unsigned int, T> > & p_chemin);
     
 private:
+	solution DijkstraCalculerChemins(const unsigned int p_origine) const;
+
 	size_t m_nbSommets;
 	std::vector<T> m_noms;  /*! les noms donnés aux sommets */
     std::vector< std::vector<N> > m_matrice; /*!< la matrice d'adjacence */
     
     liste_voisins m_listeVoisin;
     std::map<unsigned int, solution> m_solutions;
-	//std::vector<N> m_distance_minimum;
-	//std::vector<unsigned int> m_predecesseur;
 };
 
 

@@ -126,7 +126,7 @@ int executionUnePaireNouvelAlgo()
 	if (gettimeofday(&tv1, 0) != 0)
 			throw logic_error("gettimeofday() a échoué");
 
-	vector< pair<unsigned int, string> > chemin;
+	deque< pair<unsigned int, string> > chemin;
 	duree = metro.dijkstraV2(numOrigine,numDestination,chemin);
 	if (duree == numeric_limits<unsigned int>::max())
 		throw logic_error("Graphe<T,N>::DijkstraCalculerChemins: pas de solution pour cette paire origine/destination");
@@ -169,9 +169,6 @@ int moyenneToutesLesPairesAncienAlgo()
 	long double sum_avg = 0;
 	for (unsigned int i = 0; i < nbSt; ++i) {
 		unsigned long total_ms = 0;
-		//std::vector<unsigned int> distance_minimum;
-		//std::vector<unsigned int> predecesseurs;
-		//metro.DijkstraCalculerChemins(i);
 		for (unsigned int j = 0; j < nbSt; ++j) 
 		{
 			if (j != i) 
@@ -179,7 +176,6 @@ int moyenneToutesLesPairesAncienAlgo()
 				if (gettimeofday(&tv1, 0) != 0)
 					throw logic_error("gettimeofday() a échoué");
 				duree = metro.dijkstra(i, j, chemin);
-				//duree = metro.DijkstraObtenirPlusPetitCheminVers(j).size();
 				if (gettimeofday(&tv2, 0) != 0)
 					throw logic_error("gettimeofday() a échoué");
 				POSTCONDITION(duree >= 0);
@@ -206,7 +202,7 @@ int moyenneToutesLesPairesNouvelAlgo()
 	Graphe<string,unsigned int> metro = chargerGraphe(fichier);
 
 	unsigned int duree;
-	vector< pair<unsigned int, string> > chemin;
+	deque< pair<unsigned int, string> > chemin;
 
 	const unsigned int nbSt = 376;
 	cout
@@ -216,8 +212,6 @@ int moyenneToutesLesPairesNouvelAlgo()
 	long double sum_avg = 0;
 	for (unsigned int i = 0; i < nbSt; ++i) {
 		unsigned long total_ms = 0;
-		//std::vector<unsigned int> distance_minimum;
-		//std::vector<unsigned int> predecesseurs;
 		for (unsigned int j = 0; j < nbSt; ++j)
 		{
 			if (j != i)
@@ -259,12 +253,12 @@ void comparerAlgo()
 	Graphe<string,unsigned int> metro2 = chargerGraphe(fichier2);
 
 	vector< pair<unsigned int, string> > chemin;
-	vector< pair<unsigned int, string> > chemin2;
+	deque< pair<unsigned int, string> > chemin2;
 
 	const unsigned int nbSt = 376;
 
 	for (unsigned int i = 0; i < nbSt; ++i) {
-		cout << "For" << i << "\n";
+		cout << "Pour origine " << i << "\n";
 		for (unsigned int j = 0; j < nbSt; ++j)
 		{
 			if (j != i)
@@ -309,8 +303,12 @@ void comparerAlgo()
 
 int main()
 {
-//	comparerAlgo();
-//	return executionUnePaireNouvelAlgo();
+	//comparerAlgo();
+	//while (1)
+	//{
+	//	executionUnePaireAncienAlgo();
+		//executionUnePaireNouvelAlgo();
+	//}
 //	return moyenneToutesLesPaires();
 	return moyenneToutesLesPaires20fois();
 }
