@@ -201,20 +201,20 @@ N Graphe<T,N>::dijkstraV2(const unsigned int & p_origine, const unsigned int & p
 
 	//p_chemin = this->DijkstraObtenirPlusPetitCheminVers(p_destination, predecesseur);
 
-	//std::stack<unsigned int> pileDuChemin;
-	std::deque<unsigned int> dequeDuChemin;
+	std::stack<unsigned int> pileDuChemin;
+	//std::deque<unsigned int> dequeDuChemin;
 	for (unsigned int sommetPrecedent = p_destination;sommetPrecedent != std::numeric_limits<unsigned int>::max(); sommetPrecedent =  solutionTrouve.predecesseurs[sommetPrecedent])
 	{
-		dequeDuChemin.push_front(sommetPrecedent);
-		//pileDuChemin.push(sommetPrecedent);
+		//dequeDuChemin.push_front(sommetPrecedent);
+		pileDuChemin.push(sommetPrecedent);
 
 	}
 
-	//	while(!pileDuChemin.empty())
-	//	{
-	//		p_chemin.push_back( pair<unsigned int, T>(pileDuChemin.top(), reqNom(pileDuChemin.top())) );
-	//		pileDuChemin.pop();
-	//	}
+	while(!pileDuChemin.empty())
+	{
+		p_chemin.push_back( pair<unsigned int, T>(pileDuChemin.top(), reqNom(pileDuChemin.top())) );
+		pileDuChemin.pop();
+	}
 	//std::reverse(p_chemin.begin(), p_chemin.end());
 	//cas où l'on n'a pas de solution
 	if (solutionTrouve.predecesseurs[p_destination] == numeric_limits<unsigned int>::max()

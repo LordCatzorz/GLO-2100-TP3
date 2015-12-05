@@ -264,7 +264,7 @@ void comparerAlgo()
 	const unsigned int nbSt = 376;
 
 	for (unsigned int i = 0; i < nbSt; ++i) {
-		cout << "For" << i << "\n";
+		cout << "Pour origine " << i << "\n";
 		for (unsigned int j = 0; j < nbSt; ++j)
 		{
 			if (j != i)
@@ -309,8 +309,12 @@ void comparerAlgo()
 
 int main()
 {
-//	comparerAlgo();
-//	return executionUnePaireNouvelAlgo();
+	comparerAlgo();
+	//while (1)
+	//{
+	//	executionUnePaireAncienAlgo();
+		//executionUnePaireNouvelAlgo();
+	//}
 //	return moyenneToutesLesPaires();
 	return moyenneToutesLesPaires20fois();
 }
