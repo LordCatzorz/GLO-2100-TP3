@@ -303,7 +303,7 @@ void comparerAlgo()
 
 int main()
 {
-	comparerAlgo();
+	//comparerAlgo();
 	//while (1)
 	//{
 	//	executionUnePaireAncienAlgo();
