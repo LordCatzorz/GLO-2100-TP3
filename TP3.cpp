@@ -169,9 +169,6 @@ int moyenneToutesLesPairesAncienAlgo()
 	long double sum_avg = 0;
 	for (unsigned int i = 0; i < nbSt; ++i) {
 		unsigned long total_ms = 0;
-		//std::vector<unsigned int> distance_minimum;
-		//std::vector<unsigned int> predecesseurs;
-		//metro.DijkstraCalculerChemins(i);
 		for (unsigned int j = 0; j < nbSt; ++j) 
 		{
 			if (j != i) 
@@ -179,7 +176,6 @@ int moyenneToutesLesPairesAncienAlgo()
 				if (gettimeofday(&tv1, 0) != 0)
 					throw logic_error("gettimeofday() a échoué");
 				duree = metro.dijkstra(i, j, chemin);
-				//duree = metro.DijkstraObtenirPlusPetitCheminVers(j).size();
 				if (gettimeofday(&tv2, 0) != 0)
 					throw logic_error("gettimeofday() a échoué");
 				POSTCONDITION(duree >= 0);
@@ -216,8 +212,6 @@ int moyenneToutesLesPairesNouvelAlgo()
 	long double sum_avg = 0;
 	for (unsigned int i = 0; i < nbSt; ++i) {
 		unsigned long total_ms = 0;
-		//std::vector<unsigned int> distance_minimum;
-		//std::vector<unsigned int> predecesseurs;
 		for (unsigned int j = 0; j < nbSt; ++j)
 		{
 			if (j != i)

@@ -47,18 +47,27 @@ Graphe<T,N>::~Graphe()
 {
 }
 
+//! \brief		Obtient le nombre de sommet
+//! \return		Le nombre de sommet
 template<typename T,typename N>
 size_t Graphe<T,N>::reqNbSommets() const
 {
 	return m_nbSommets;
 }
 
+//! \brief		Obtient le nom d'un sommet
+//! \param[in] 	i L'index du sommet
+//! \return 	le nom du sommet
 template<typename T,typename N>
 T Graphe<T,N>::reqNom(unsigned int i) const
 {
 	return m_noms[i];
 }
 
+//! \brief 		Obtient le poid entre deux sommet selon l'algorithme originale
+//! \param[in]	i Index sommet origine
+//! \param[in] 	j Index sommet destination
+//! \return		Le poids entre ces deux sommets
 template<typename T,typename N>
 const N & Graphe<T,N>::reqPoids(unsigned int i, unsigned int j) const
 {
@@ -66,6 +75,10 @@ const N & Graphe<T,N>::reqPoids(unsigned int i, unsigned int j) const
 	return m_matrice[i][j];
 }
 
+
+//! \brief 		Defini le nom d'un sommet
+//! \param[in]	i Index sommet
+//! \param[in] 	p_nom Référence vers le nom du sommet
 template<typename T,typename N>
 void Graphe<T,N>::nommer(unsigned int i, const T & p_nom)
 {
@@ -185,6 +198,8 @@ template<typename T,typename N>
 N Graphe<T,N>::dijkstraV2(const unsigned int & p_origine, const unsigned int & p_destination,
 		std::vector< std::pair<unsigned int, T> > & p_chemin)
 {
+	PRECONDITION( p_origine < m_nbSommets && p_destination < m_nbSommets);
+
 	typename Graphe<T,N>::solution solutionTrouve;
 	typename std::map<unsigned int, Graphe<T,N>::solution>::const_iterator iter = this->m_solutions.find(p_origine);
 	if (iter != this->m_solutions.end())
@@ -199,15 +214,11 @@ N Graphe<T,N>::dijkstraV2(const unsigned int & p_origine, const unsigned int & p
 		this->m_solutions.insert(pair);
 	}
 
-	//p_chemin = this->DijkstraObtenirPlusPetitCheminVers(p_destination, predecesseur);
 
 	std::stack<unsigned int> pileDuChemin;
-	//std::deque<unsigned int> dequeDuChemin;
 	for (unsigned int sommetPrecedent = p_destination;sommetPrecedent != std::numeric_limits<unsigned int>::max(); sommetPrecedent =  solutionTrouve.predecesseurs[sommetPrecedent])
 	{
-		//dequeDuChemin.push_front(sommetPrecedent);
 		pileDuChemin.push(sommetPrecedent);
-
 	}
 
 	while(!pileDuChemin.empty())
@@ -215,7 +226,7 @@ N Graphe<T,N>::dijkstraV2(const unsigned int & p_origine, const unsigned int & p
 		p_chemin.push_back( pair<unsigned int, T>(pileDuChemin.top(), reqNom(pileDuChemin.top())) );
 		pileDuChemin.pop();
 	}
-	//std::reverse(p_chemin.begin(), p_chemin.end());
+
 	//cas où l'on n'a pas de solution
 	if (solutionTrouve.predecesseurs[p_destination] == numeric_limits<unsigned int>::max()
 	       && p_destination != p_origine)
