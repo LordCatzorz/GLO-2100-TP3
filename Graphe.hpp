@@ -240,10 +240,12 @@ N Graphe<T,N>::dijkstraV2(const unsigned int & p_origine, const unsigned int & p
 //! \param[in] p_origine l'index d'un sommet du graphe.
 //! \param[out] p_distance_minimum Un vecteur de taille qui représente la longueur du plus petit chemin du sommet d'origine au sommet à l'index.
 //! \param[out] p_predecesseur Un vecteur d'index qui représente l'index du sommet précédent l'index dans son chemin le plus court du point d'origine
+//! \pre p_origine doit être un sommet du graph
 //! \note C'est algorithme est une version franciser de celui disponible au http://rosettacode.org/wiki/Dijkstra's_algorithm#C.2B.2B
 template<typename T,typename N>
 typename Graphe<T,N>::solution Graphe<T,N>::DijkstraCalculerChemins(unsigned int p_origine) const
 {
+	PRECONDITION( p_origine < m_nbSommets);
 	int tailleListeVoisin = m_listeVoisin.size();
 	typename Graphe<T,N>::solution laSolution;
 	laSolution.distance_minimum.clear();
